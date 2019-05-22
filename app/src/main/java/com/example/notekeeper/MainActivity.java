@@ -19,6 +19,7 @@ public class MainActivity extends AppCompatActivity {
 
     public static final String NOTE_INFO = "com.example.notekeeper.NOTE_INFO";
     private NoteInfo note;
+    private boolean isNewNote;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,7 +40,10 @@ public class MainActivity extends AppCompatActivity {
 
         readDisplayStateValues();
 
-        displayNote(spinnerCourses, textNoteTitle, textNoteText);
+        //if there's a new note, don't call the display note function
+        if (!isNewNote) {
+            displayNote(spinnerCourses, textNoteTitle, textNoteText);
+        }
     }
 
     private void displayNote(Spinner spinnerCourses, EditText textNoteTitle, EditText textNoteText) {
@@ -53,6 +57,7 @@ public class MainActivity extends AppCompatActivity {
     private void readDisplayStateValues() {
         Intent intent = getIntent();
         note = intent.getParcelableExtra(NOTE_INFO);
+        isNewNote = note == null;
     }
 
     @Override
