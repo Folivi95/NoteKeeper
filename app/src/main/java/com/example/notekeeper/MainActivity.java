@@ -2,11 +2,8 @@ package com.example.notekeeper;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ArrayAdapter;
@@ -17,8 +14,9 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
-    public static final String NOTE_INFO = "com.example.notekeeper.NOTE_INFO";
-    private NoteInfo note;
+    public static final String NOTE_POSITION = "com.example.notekeeper.NOTE_POSITION";
+    public static final int POSITION_NOT_SET = -1;
+    private NoteInfo noteValue;
     private boolean isNewNote;
 
     @Override
@@ -48,16 +46,20 @@ public class MainActivity extends AppCompatActivity {
 
     private void displayNote(Spinner spinnerCourses, EditText textNoteTitle, EditText textNoteText) {
         List<CourseInfo> courses = DataManager.getInstance().getCourses();
-        int courseIndex = courses.indexOf(note.getCourse());
+        int courseIndex = courses.indexOf(spinnerCourses);
         spinnerCourses.setSelection(courseIndex);
-        textNoteTitle.setText(note.getTitle());
-        textNoteText.setText(note.getText());
+        textNoteTitle.setText(noteValue.getTitle());
+        textNoteText.setText(noteValue.getText());
     }
 
     private void readDisplayStateValues() {
         Intent intent = getIntent();
-        note = intent.getParcelableExtra(NOTE_INFO);
-        isNewNote = note == null;
+        int notePosition = intent.getIntExtra(NOTE_POSITION, POSITION_NOT_SET);
+        isNewNote = notePosition == POSITION_NOT_SET;
+
+        if (!isNewNote){
+            noteValue = DataManager.getInstance().getNotes().get(notePosition);
+        }
     }
 
     @Override
