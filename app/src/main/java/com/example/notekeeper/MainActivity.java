@@ -46,6 +46,8 @@ public class MainActivity extends AppCompatActivity {
         List<CourseInfo> courses = DataManager.getInstance().getCourses();
         int courseIndex = courses.indexOf(note.getCourse());
         spinnerCourses.setSelection(courseIndex);
+        textNoteTitle.setText(note.getTitle());
+        textNoteText.setText(note.getText());
     }
 
     private void readDisplayStateValues() {
