@@ -11,7 +11,6 @@ import java.util.List;
  * Created by Jim.
  */
 
-@SuppressLint("ParcelCreator")
 public final class CourseInfo implements Parcelable {
     private final String mCourseId;
     private final String mTitle;
@@ -22,6 +21,24 @@ public final class CourseInfo implements Parcelable {
         mTitle = title;
         mModules = modules;
     }
+
+    protected CourseInfo(Parcel in) {
+        mCourseId = in.readString();
+        mTitle = in.readString();
+        mModules = in.createTypedArrayList(ModuleInfo.CREATOR);
+    }
+
+    public static final Creator<CourseInfo> CREATOR = new Creator<CourseInfo>() {
+        @Override
+        public CourseInfo createFromParcel(Parcel in) {
+            return new CourseInfo(in);
+        }
+
+        @Override
+        public CourseInfo[] newArray(int size) {
+            return new CourseInfo[size];
+        }
+    };
 
     public String getCourseId() {
         return mCourseId;
@@ -85,6 +102,8 @@ public final class CourseInfo implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-
+        dest.writeString(mCourseId);
+        dest.writeString(mTitle);
+        dest.writeTypedList(mModules);
     }
 }
