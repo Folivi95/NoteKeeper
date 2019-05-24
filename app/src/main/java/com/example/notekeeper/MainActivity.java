@@ -18,6 +18,9 @@ public class MainActivity extends AppCompatActivity {
     public static final int POSITION_NOT_SET = -1;
     private NoteInfo noteValue;
     private boolean isNewNote;
+    private Spinner spinnerCourses;
+    private EditText textNoteTitle;
+    private EditText textNoteText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,9 +29,9 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        Spinner spinnerCourses = findViewById(R.id.spinner_courses);
-        EditText textNoteTitle = findViewById(R.id.text_note_title);
-        EditText textNoteText = findViewById(R.id.text_note_text);
+        spinnerCourses = findViewById(R.id.spinner_courses);
+        textNoteTitle = findViewById(R.id.text_note_title);
+        textNoteText = findViewById(R.id.text_note_text);
 
         List<CourseInfo> courses = DataManager.getInstance().getCourses();
         ArrayAdapter<CourseInfo> adapterCourses = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, courses);
@@ -77,10 +80,24 @@ public class MainActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_send_mail) {
+            sendMail();
             return true;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void sendMail() {
+        CourseInfo courses = (CourseInfo) spinnerCourses.getSelectedItem();
+        String mailSubject = textNoteTitle.getText().toString();
+        String mailBody = "Check what I learned in pluralsight course \"" +
+                courses.getTitle() + "\"\n" + textNoteText.getText().toString();
+
+        Intent intent = new Intent(Intent.ACTION_SEND);
+        intent.setType("message/rfc2822");
+        intent.putExtra(Intent.EXTRA_SUBJECT, mailSubject);
+        intent.putExtra(Intent.EXTRA_TEXT, mailBody);
+        startActivity(intent);
     }
 }
