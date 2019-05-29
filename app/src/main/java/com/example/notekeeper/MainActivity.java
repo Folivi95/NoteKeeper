@@ -23,6 +23,9 @@ public class MainActivity extends AppCompatActivity {
     private EditText textNoteText;
     private int newNotePosition;
     private boolean isCancelled;
+    private String originalCourseId;
+    private String originalNoteTitle;
+    private String originalNoteText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,11 +45,22 @@ public class MainActivity extends AppCompatActivity {
         spinnerCourses.setAdapter(adapterCourses);
 
         readDisplayStateValues();
+        saveOriginalNoteValues();
 
         //if there's a new note, don't call the display note function
         if (!isNewNote) {
             displayNote(spinnerCourses, textNoteTitle, textNoteText);
         }
+    }
+
+    private void saveOriginalNoteValues() {
+        if (isNewNote){
+            return;
+        }
+
+        originalCourseId = noteValue.getCourse().getCourseId();
+        originalNoteTitle = noteValue.getTitle();
+        originalNoteText = noteValue.getText();
     }
 
     private void displayNote(Spinner spinnerCourses, EditText textNoteTitle, EditText textNoteText) {
@@ -88,10 +102,19 @@ public class MainActivity extends AppCompatActivity {
         if (isCancelled){
             if (isNewNote) {
                 DataManager.getInstance().removeNote(newNotePosition);
+            }else {
+                restoreOriginalNoteValues();
             }
         }else {
             saveNote();
         }
+    }
+
+    private void restoreOriginalNoteValues() {
+        CourseInfo course = DataManager.getInstance().getCourse(originalCourseId);
+        noteValue.setCourse(course);
+        noteValue.setTitle(originalNoteTitle);
+        noteValue.setText(originalNoteText);
     }
 
     private void saveNote() {
