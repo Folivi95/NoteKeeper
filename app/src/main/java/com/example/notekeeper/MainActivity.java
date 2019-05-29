@@ -21,6 +21,8 @@ public class MainActivity extends AppCompatActivity {
     private Spinner spinnerCourses;
     private EditText textNoteTitle;
     private EditText textNoteText;
+    private int newNotePosition;
+    private boolean isCancelled;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,9 +62,17 @@ public class MainActivity extends AppCompatActivity {
         int notePosition = intent.getIntExtra(NOTE_POSITION, POSITION_NOT_SET);
         isNewNote = notePosition == POSITION_NOT_SET;
 
-        if (!isNewNote){
+        if (isNewNote){
+            createNewNote();
+        } else{
             noteValue = DataManager.getInstance().getNotes().get(notePosition);
         }
+    }
+
+    private void createNewNote() {
+        DataManager dm = DataManager.getInstance();
+        newNotePosition = dm.createNewNote();
+        noteValue = dm.getNotes().get(newNotePosition);
     }
 
     @Override
@@ -70,6 +80,24 @@ public class MainActivity extends AppCompatActivity {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (isCancelled){
+            if (isNewNote) {
+                DataManager.getInstance().removeNote(newNotePosition);
+            }
+        }else {
+            saveNote();
+        }
+    }
+
+    private void saveNote() {
+        noteValue.setCourse((CourseInfo) spinnerCourses.getSelectedItem());
+        noteValue.setTitle(textNoteTitle.getText().toString());
+        noteValue.setText(textNoteText.getText().toString());
     }
 
     @Override
@@ -83,6 +111,9 @@ public class MainActivity extends AppCompatActivity {
         if (id == R.id.action_send_mail) {
             sendMail();
             return true;
+        }else if (id == R.id.action_cancel){
+            isCancelled = true;
+            finish();
         }
 
         return super.onOptionsItemSelected(item);
