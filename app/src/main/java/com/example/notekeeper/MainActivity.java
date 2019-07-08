@@ -146,6 +146,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        MenuItem item = menu.findItem(R.id.action_next);
+        int lastNoteIndex = DataManager.getInstance().getNotes().size() - 1;
+        item.setEnabled(newNotePosition < lastNoteIndex);
+        return super.onPrepareOptionsMenu(menu);
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
@@ -159,9 +167,22 @@ public class MainActivity extends AppCompatActivity {
         }else if (id == R.id.action_cancel){
             isCancelled = true;
             finish();
+        }else if (id == R.id.action_next){
+            moveNext();
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void moveNext() {
+        saveNote();
+        ++newNotePosition;
+
+        noteValue = DataManager.getInstance().getNotes().get(newNotePosition);
+
+        saveOriginalNoteValues();
+        displayNote(spinnerCourses, textNoteTitle, textNoteText);
+        invalidateOptionsMenu();
     }
 
     private void sendMail() {
