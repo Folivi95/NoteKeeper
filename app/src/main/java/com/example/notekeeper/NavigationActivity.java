@@ -1,5 +1,6 @@
 package com.example.notekeeper;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -22,6 +23,10 @@ public class NavigationActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     private NoteRecyclerAdapter _noteRecyclerAdapter;
+    private RecyclerView _recyclerItems;
+    private LinearLayoutManager _notesLayoutManager;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -32,8 +37,7 @@ public class NavigationActivity extends AppCompatActivity
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                startActivity(new Intent(NavigationActivity.this, MainActivity.class));
             }
         });
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
@@ -43,6 +47,9 @@ public class NavigationActivity extends AppCompatActivity
         drawer.addDrawerListener(toggle);
         toggle.syncState();
         navigationView.setNavigationItemSelectedListener(this);
+
+        //initialize display contents
+        initializeDisplayContent();
     }
 
     @Override
@@ -52,14 +59,21 @@ public class NavigationActivity extends AppCompatActivity
     }
 
     private void initializeDisplayContent() {
-
-        final RecyclerView recyclerNotes = findViewById(R.id.list_notes);
-        final LinearLayoutManager notesLayoutManager = new LinearLayoutManager(this);
-        recyclerNotes.setLayoutManager(notesLayoutManager);
+        _recyclerItems = findViewById(R.id.list_items);
+        _notesLayoutManager = new LinearLayoutManager(this);
 
         List<NoteInfo> notes = DataManager.getInstance().getNotes();
         _noteRecyclerAdapter = new NoteRecyclerAdapter(this, notes);
-        recyclerNotes.setAdapter(_noteRecyclerAdapter);
+        displayNotes();
+
+        NavigationView navigationView = findViewById(R.id.nav_view);
+        Menu menu = navigationView.getMenu();
+        menu.findItem(R.id.nav_notes).setChecked(true);
+    }
+
+    private void displayNotes() {
+        _recyclerItems.setLayoutManager(_notesLayoutManager);
+        _recyclerItems.setAdapter(_noteRecyclerAdapter);
     }
 
     @Override
@@ -94,28 +108,28 @@ public class NavigationActivity extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
-    @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_home) {
-            // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
-
-        } else if (id == R.id.nav_slideshow) {
-
-        } else if (id == R.id.nav_tools) {
-
+        if (id == R.id.nav_notes) {
+            displayNotes();
+        } else if (id == R.id.nav_courses) {
+            handleSelection("Courses");
         } else if (id == R.id.nav_share) {
-
+            handleSelection("You've shared enough");
         } else if (id == R.id.nav_send) {
-
+            handleSelection("Send");
         }
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    private void handleSelection(String message) {
+        View view = findViewById(R.id.list_items);
+        Snackbar.make(view, message, Snackbar.LENGTH_LONG).show();
     }
 }
